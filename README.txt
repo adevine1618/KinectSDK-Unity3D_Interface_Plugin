@@ -1,7 +1,7 @@
 *********************************README*********************************
 
                       KinectSDK / Unity3D Interface
-		                  v.4.0
+		                  v.4.1
 
                              Andrew DeVine
                  University of Central Florida ISUE Lab
@@ -14,6 +14,19 @@ Thanks for downloading!
 The Microsoft Kinect SDK v.1.0 is required for this dll:
 
 http://www.microsoft.com/en-us/kinectforwindows/download
+
+Changes:
+	A bug was fixed, occuring on restarting gameplay in Unity, which
+	caused the editor to freeze. Due to limitations with the Kinect SDK,
+	prohibiting uninitialization and re-initialization of the sensor
+	within a running application, the sensor remains on after the first
+	NuiInit call.
+		In the interest of condensing this download, I did not
+	include an editor script to turn off the sensor when you close Unity
+	(as this is not a problem for a Unity .exe build of the project,
+	only when using the editor). You will see the red IR projector still
+	active on your Kinect after you close the editor. So, BE SURE TO
+	DISCONNECT YOUR SENSOR AFTER YOU CLOSE UNITY.
 
 
 ************************************************************************
