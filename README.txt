@@ -1,7 +1,7 @@
 *********************************README*********************************
 
                       KinectSDK / Unity3D Interface
-		                  v.4.1
+		                  v.5.0
 
                              Andrew DeVine
                  University of Central Florida ISUE Lab
@@ -15,36 +15,55 @@ The Microsoft Kinect SDK v.1.0 is required for this dll:
 
 http://www.microsoft.com/en-us/kinectforwindows/download
 
-Changes:
-	A bug was fixed, occuring on restarting gameplay in Unity, which
-	caused the editor to freeze. Due to limitations with the Kinect SDK,
-	prohibiting uninitialization and re-initialization of the sensor
-	within a running application, the sensor remains on after the first
-	NuiInit call.
-		In the interest of condensing this download, I did not
-	include an editor script to turn off the sensor when you close Unity
-	(as this is not a problem for a Unity .exe build of the project,
-	only when using the editor). You will see the red IR projector still
-	active on your Kinect after you close the editor. So, BE SURE TO
-	DISCONNECT YOUR SENSOR AFTER YOU CLOSE UNITY.
+
+New Features with this Release:
+
+    1) The Depth and RGB streams are now available for your enjoyment!
+    
+    2) Intellisense summaries have been added for public members
+
+    3) Now distributed as a Unity package for easy setup
+
+WARNING: Using both the RGB and Depth feeds will cause a significant
+drop in performance. Please be sure your system meets the requirements
+found in the website above to maximize your experience with the SDK.
 
 
 ************************************************************************
                                  SETUP
 ************************************************************************
 
-1) Copy KUInterface.dll into the Unity game's working directory
-(Main Folder; It shares the game's name, and is the parent folder of
-'Assets').
+In Unity:
+    Assets -> Import Package -> Custom Package
 
-2) Add KUInterface.cs to your Unity project (Assets/Scripts) and attach
-it to a GameObject.
-See: http://unity3d.com/support/documentation/Manual/Scripting.html
+Select the package from the directory you downloaded it to!
+
+Simple.
 
 
 ************************************************************************
                                   USE
 ************************************************************************
+
+PUBLIC SETTINGS:
+
+scaleFactor: scales all joint positions by this number. Do not set to zero.
+
+twoPlayer: set to true to track the maximum of two skeletons. Do not change
+           value while in play.
+
+useRGB: update RGB feed every frame. Set to false if not being used to
+        optimize performance. Do not change value while in play.
+
+useDepth: update depth feed every frame. Set to false if not being used to
+          optimize performance. Do not change value while in play.
+
+displayJointInformation: for visualization of data.
+
+diplayTextureImage: renders RGB feed on-screen.
+
+displayDepthImage: renders depth feed on-screen as reverse-intensity image.
+
 
 NUI:
 
@@ -56,8 +75,15 @@ for player = 1,2 to use two-player mode. The Microsoft Kinect SDK supports
 a maximum of two players with fully recognized skeletons. To use this,
 field 'twoPlayer' must be set to 'True'.
 
-- To display the joint information on the screen, set
-'displayJointInformation' to 'True'.
+
+IMAGE STREAMS:
+
+- Call GetTextureImage() to get the RGB camera's current output as a
+Texture2D object.
+
+- Call GetDepthData() to return the pixel depths as a byte[][] array. The
+coordinate depth[x=0][y=0] corresponds to the top-left corner of the depth
+camera's viewport.
 
 
 CAMERA:
