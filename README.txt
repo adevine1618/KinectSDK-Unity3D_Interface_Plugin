@@ -1,44 +1,37 @@
 *********************************README*********************************
 
                       KinectSDK / Unity3D Interface
-		                  v.5.0
+		                  
 
                              Andrew DeVine
-                 University of Central Florida ISUE Lab
-                    http://www.eecs.ucf.edu/isuelab
 
 ************************************************************************
 
 Thanks for downloading!
 
-The Microsoft Kinect SDK v.1.0 is required for this dll:
+The Microsoft Kinect SDK v.1.7 is required for this dll:
 
-http://www.microsoft.com/en-us/kinectforwindows/download
+http://www.microsoft.com/en-us/kinectforwindows/develop/developer-downloads.aspx
 
 
-New Features with this Release:
+Since there still seems to be a demand for this, I've revisited it.
+If you're still getting a 'DLL not found' error after following the setup
+instructions, make sure the Environment Variable 'KINECTSDK10_DIR' is set
+to...you guessed it...the Kinect SDK dir.
 
-    1) The Depth and RGB streams are now available for your enjoyment!
-    
-    2) Intellisense summaries have been added for public members
-
-    3) Now distributed as a Unity package for easy setup
-
-WARNING: Using both the RGB and Depth feeds will cause a significant
-drop in performance. Please be sure your system meets the requirements
-found in the website above to maximize your experience with the SDK.
+This hasn't been rigorously tested, so the source is also on Github.
 
 
 ************************************************************************
                                  SETUP
 ************************************************************************
 
-In Unity:
-    Assets -> Import Package -> Custom Package
+copy KUInterface.dll to the game's working directory (the folder that shares
+your game's name, NOT the assets folder).
 
-Select the package from the directory you downloaded it to!
+import the C# file into your game, and attach it to a game object.
 
-Simple.
+use the C# functions as you would any other script in Unity.
 
 
 ************************************************************************
@@ -98,7 +91,7 @@ do not remove this code). The camera is capable of -27 deg. to 27 deg.
 
 
 ************************************************************************
-March 2012
+July 2013
 
-Questions? email: adevine@knights.ucf.edu
+Questions? email: andrew@ardevine.com
 ************************************************************************
