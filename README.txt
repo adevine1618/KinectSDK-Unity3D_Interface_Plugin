@@ -82,7 +82,7 @@ IMAGE STREAMS:
 - Call GetTextureImage() to get the RGB camera's current output as a
 Texture2D object.
 
-- Call GetDepthData() to return the pixel depths as a byte[][] array. The
+- Call GetDepthData() to return the pixel depths as a short[][] array. The
 coordinate depth[x=0][y=0] corresponds to the top-left corner of the depth
 camera's viewport.
 
