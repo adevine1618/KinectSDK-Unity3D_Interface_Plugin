@@ -13,6 +13,14 @@ The Microsoft Kinect SDK v.1.7 is required for this dll:
 
 http://www.microsoft.com/en-us/kinectforwindows/develop/developer-downloads.aspx
 
+Changes (08/16/13):
+- DLL LOCATION HAS CHANGED TO ASSETS/PLUGINS
+- Initialization routine now starts first connected sensor found.
+- Depth Stream is now correct. The depth stream is actually of type 'short'.
+  However, Color32 object requires bytes. Therefore, the displayed depth
+  image is 'looped' over intensities, in order to not lose resolution.
+- There still seems to be a problem with editing scripts, then returning
+  to the Unity window and having it crash on play. I'm investigating this.
 
 Since there still seems to be a demand for this, I've revisited it.
 If you're still getting a 'DLL not found' error after following the setup
@@ -20,14 +28,14 @@ instructions, make sure the Environment Variable 'KINECTSDK10_DIR' is set
 to...you guessed it...the Kinect SDK dir.
 
 This hasn't been rigorously tested, so the source is also on Github.
+You'll probably have to change the build directory.
 
 
 ************************************************************************
                                  SETUP
 ************************************************************************
 
-copy KUInterface.dll to the game's working directory (the folder that shares
-your game's name, NOT the assets folder).
+copy KUInterface.dll to Assets/Plugins
 
 import the C# file into your game, and attach it to a game object.
 
@@ -91,7 +99,7 @@ do not remove this code). The camera is capable of -27 deg. to 27 deg.
 
 
 ************************************************************************
-July 2013
+Aug 2013
 
 Questions? email: andrew@ardevine.com
 ************************************************************************

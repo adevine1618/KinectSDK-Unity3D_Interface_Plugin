@@ -63,7 +63,7 @@ public class KUInterface : MonoBehaviour {
     private byte[] seqDepth;
     private Color32[] dcols;
     private Texture2D depthImg;
-    private byte[][] depth;
+    private short[][] depth;
 
 
 /********************************************************************************
@@ -79,17 +79,20 @@ public class KUInterface : MonoBehaviour {
     public Vector3 GetJointPos(int player, KinectWrapper.Joints joint) {
 
         KinectWrapper.SkeletonTransform trans = new KinectWrapper.SkeletonTransform();
-        if (NUIisReady && (player == 1 || player == 2)) {
+        if (NUIisReady && (player == 1 || player == 2))
+        {
             KinectWrapper.GetSkeletonTransform(player, (int)joint, ref trans);
             return new Vector3(trans.x * scaleFactor, trans.y * scaleFactor, trans.z * scaleFactor);
-        } else {
+        }
+        else
+        {
             return Vector3.zero;
         }
     }
 
 
     /// <summary>
-    /// one-player override of joint position get function
+    /// one-player overload of joint position get function
     /// </summary>
     /// <param name="joint">KinectWrapper.Joints enum</param>
     /// <returns>position of given joint</returns>
@@ -114,7 +117,7 @@ public class KUInterface : MonoBehaviour {
     /// </summary>
     /// <returns>2D array of pixel depths as bytes</returns>
     /// <remarks>depth[x=0][y=0] corresponds to top-left corner of image</remarks>
-    public byte[][] GetDepthData() {
+    public short[][] GetDepthData() {
 
         return this.depth;
     }
@@ -181,12 +184,12 @@ public class KUInterface : MonoBehaviour {
         cols = new Color32[IM_W * IM_H];
         texture = new Texture2D(IM_W, IM_H);
 
-        seqDepth = new byte[IM_W * IM_H * 4];
+        seqDepth = new byte[IM_W * IM_H * 2];
         dcols = new Color32[IM_W * IM_H];
         depthImg = new Texture2D(IM_W, IM_H);
-        depth = new byte[IM_W][];
+        depth = new short[IM_W][];
         for (int i = 0; i < depth.Length; i++) {
-            depth[i] = new byte[IM_H];
+            depth[i] = new short[IM_H];
         }
     }
 
@@ -194,9 +197,9 @@ public class KUInterface : MonoBehaviour {
     //called on application stop
     private void OnApplicationQuit() {
 
+        NUIisReady = false;
         KinectWrapper.NuiContextUnInit();
         Debug.Log("Sensor Off.");
-        NUIisReady = false;
     }
 
 
@@ -226,16 +229,22 @@ public class KUInterface : MonoBehaviour {
 
         //copy pixel data from unmanaged memory
         IntPtr ptr = KinectWrapper.GetTextureImage(ref size);
-        Marshal.Copy(ptr, seqTex, 0, size);
 
-        //create color matrix
-        for (int i = 0; i < (IM_W * IM_H * 4); i += 4) {
-            cols[(IM_W * IM_H) - (i / 4) - 1] = new Color32(seqTex[i + 2], seqTex[i + 1], seqTex[i], 255);
+        if (ptr != IntPtr.Zero)
+        {
+            Marshal.Copy(ptr, seqTex, 0, size);
+            Debug.Log(size.ToString());
+
+            //create color matrix
+            for (int i = 0; i < (IM_W * IM_H * 4); i += 4)
+            {
+                cols[(IM_W * IM_H) - (i / 4) - 1] = new Color32(seqTex[i + 2], seqTex[i + 1], seqTex[i], 255);
+            }
+
+            //set texture
+            texture.SetPixels32(cols);
+            texture.Apply();
         }
-
-        //set texture
-        texture.SetPixels32(cols);
-        texture.Apply();
     }
 
 
@@ -246,27 +255,34 @@ public class KUInterface : MonoBehaviour {
 
         //copy pixel data from unmanaged memory
         IntPtr ptr = KinectWrapper.GetDepthImage(ref size);
-        Marshal.Copy(ptr, seqDepth, 0, size);
 
-        if (displayDepthImage)
+        if (ptr != IntPtr.Zero)
         {
-            //create color matrix
-            for (int i = 0; i < (IM_W * IM_H * 4); i += 4)
-            {
-                dcols[(IM_W * IM_H) - (i / 4) - 1] = new Color32(seqDepth[i + 2], seqDepth[i + 1], seqDepth[i], 255);
-            }
+            Marshal.Copy(ptr, seqDepth, 0, size);
 
-            //set texture
-            depthImg.SetPixels32(dcols);
-            depthImg.Apply();
-        }
-
-        //create depth array
-        for (int y = 0; y < IM_H; y++)
-        {
+            //create depth array
             for (int x = 0; x < IM_W; x++)
             {
-                depth[x][y] = seqDepth[(IM_H * IM_W * 2) - (IM_W * 2 * y) - ((x * 2) + 1)];
+                for (int y = 0; y < IM_H; y++)
+                {
+                    depth[IM_W - x - 1][IM_H - y - 1] = BitConverter.ToInt16(seqDepth, (x*2)+(y*IM_W*2));
+                }
+            }
+
+            if (displayDepthImage)
+            {
+                //create color matrix as bytes (loops resolution)
+                for (int x = 0; x < IM_W; x++)
+                {
+                    for (int y = 0; y < IM_H; y++)
+                    {
+                        dcols[x + (y * IM_W)] = new Color32((byte)depth[x][y], (byte)depth[x][y], (byte)depth[x][y], 255);
+                    }
+                }
+
+                //set texture
+                depthImg.SetPixels32(dcols);
+                depthImg.Apply();
             }
         }
     }
@@ -355,22 +371,22 @@ public class KinectWrapper {
 
 
     //NUI Context Management
-    [DllImport("/Assets/Kinect/Plugins/KUInterface.dll")]
+    [DllImport("/Assets/Plugins/KUInterface.dll")]
     public static extern bool NuiContextInit(bool twoPlayer);
-    [DllImport("/Assets/Kinect/Plugins/KUInterface.dll")]
+    [DllImport("/Assets/Plugins/KUInterface.dll")]
     public static extern void NuiUpdate();
-    [DllImport("/Assets/Kinect/Plugins/KUInterface.dll")]
+    [DllImport("/Assets/Plugins/KUInterface.dll")]
     public static extern void NuiContextUnInit();
     //Get Methods
-    [DllImport("/Assets/Kinect/Plugins/KUInterface.dll")]
+    [DllImport("/Assets/Plugins/KUInterface.dll")]
     public static extern void GetSkeletonTransform(int player, int joint, ref SkeletonTransform trans);
-    [DllImport("/Assets/Kinect/Plugins/KUInterface.dll")]
+    [DllImport("/Assets/Plugins/KUInterface.dll")]
     public static extern IntPtr GetTextureImage(ref int size);
-    [DllImport("/Assets/Kinect/Plugins/KUInterface.dll")]
+    [DllImport("/Assets/Plugins/KUInterface.dll")]
     public static extern IntPtr GetDepthImage(ref int size);
-    [DllImport("/Assets/Kinect/Plugins/KUInterface.dll")]
+    [DllImport("/Assets/Plugins/KUInterface.dll")]
     public static extern void GetCameraAngle(ref float angle);
     //Set Methods
-    [DllImport("/Assets/Kinect/Plugins/KUInterface.dll")]
+    [DllImport("/Assets/Plugins/KUInterface.dll")]
     public static extern bool SetCameraAngle(int angle);
 }
